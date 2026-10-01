@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+uv.lock linguist-generated=true
+docs/** linguist-documentation

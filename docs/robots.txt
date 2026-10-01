@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ov9bo.github.io/Chart-Digitizer/sitemap.xml

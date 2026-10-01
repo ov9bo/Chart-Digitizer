@@ -1,0 +1,28 @@
+# A commented config showing every section. Use it with any image:
+#
+#   uv run digitize examples/skewed-photo.jpg --config examples/sample.yaml
+#
+# Every key is optional except the axis ranges; the rest show the defaults.
+# To use it for one image automatically, copy it next to the image with the same stem
+# (chart1.png -> chart1.yaml), as the other files in this folder do. See
+# "Where settings come from" in README.md.
+
+axes:
+  x_range: [0, 100]   # data values at the left and right edges of the plot frame
+  y_range: [0, 100]   # data values at the bottom and top edges
+  grid_step: [10, 10] # gridline spacing drawn in replot.png
+  # x_log: true       # logarithmic axes; their ranges must be positive
+
+corners:
+  mode: auto          # or give points (source-image pixels) to skip detection:
+  # points: [[120.0, 980.0], [1480.0, 975.0], [1475.0, 110.0], [125.0, 105.0]]
+
+sampling:
+  x_values: [10, 20, 30, 40, 50, 60, 70, 80, 90]   # or points: 50, or step: 5
+
+output:
+  dir: out
+  debug: false
+
+curve:
+  color: null         # the dominant dark curve; "#rrggbb" or "hsv:h,s,v" for a colored one

@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest an improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The chart or workflow that isn't well served today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Suggested approach
+      description: The project uses classical computer vision only, with no OCR or ML.

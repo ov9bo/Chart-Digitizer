@@ -1,0 +1,8 @@
+# Settings for wavy-orange.jpg, picked up automatically because the stem matches.
+# A coloured, non-monotonic curve: the colour tells the tracer which ink to follow.
+axes:
+  x_range: [0, 100]
+  y_range: [0, 100]
+  grid_step: [10, 10]
+curve:
+  color: "#c2410c"

@@ -1,0 +1,69 @@
+[project]
+name = "chart-digitizer"
+version = "0.1.0"
+description = "Offline digitizer for photos of 2D line charts, using classical computer vision only."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Abhinaba Kar" }]
+requires-python = ">=3.11"
+keywords = [
+    "plot digitizer",
+    "graph digitizer",
+    "chart digitizer",
+    "data extraction",
+    "chart to csv",
+    "computer vision",
+    "opencv",
+    "image processing",
+    "webplotdigitizer",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Manufacturing",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "opencv-python>=4.9",
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "scipy>=1.12",
+    "typer>=0.12",
+]
+
+[project.urls]
+Homepage = "https://ov9bo.github.io/Chart-Digitizer/"
+Repository = "https://github.com/ov9bo/Chart-Digitizer"
+Issues = "https://github.com/ov9bo/Chart-Digitizer/issues"
+Changelog = "https://github.com/ov9bo/Chart-Digitizer/blob/main/CHANGELOG.md"
+
+[project.scripts]
+digitize = "chart_digitizer.cli:app"
+digitize-synth = "chart_digitizer.synth.cli:app"
+digitize-ui = "chart_digitizer.web.server:app"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chart_digitizer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: end-to-end tests on rendered charts"]

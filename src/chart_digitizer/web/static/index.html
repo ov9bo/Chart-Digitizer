@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart Digitizer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23efe9da'/%3E%3Cpath d='M5 27V5M5 27h22' stroke='%231b1813' stroke-width='2.5'/%3E%3Cpath d='M6 25C12 24 15 20 18 14s5-8 9-9' fill='none' stroke='%23e0431f' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Martian+Mono:wdth,wght@75..112.5,300..700&display=swap">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="titleblock">
+  <div class="tb-mark">
+    <span class="tb-dwg">DWG&nbsp;№&nbsp;01 · REV&nbsp;A</span>
+    <h1>Chart <em>Digitizer</em></h1>
+  </div>
+  <dl class="tb-cells">
+    <div><dt>Method</dt><dd>Classical CV — no OCR, no ML</dd></div>
+    <div><dt>Output</dt><dd id="outRoot">out/</dd></div>
+    <div><dt>Status</dt><dd><span id="lamp" class="lamp" data-state="idle">Idle</span></dd></div>
+  </dl>
+</header>
+
+<main class="bench">
+  <!-- ============ SPECIFICATION SHEET ============ -->
+  <form id="sheet" class="sheet" autocomplete="off" novalidate>
+    <fieldset class="step" style="--i:0">
+      <legend><b>01</b> Source</legend>
+      <label id="drop" class="drop">
+        <input id="file" type="file" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff,.webp,image/*">
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 40 40"><path d="M6 34V6M6 34h28" /><path class="drop-curve" d="M8 31c7-1 11-6 14-13s6-9 11-10" /></svg>
+        </span>
+        <span class="drop-text"><strong id="dropTitle">Drop a chart photo</strong><small id="dropSub">or click to browse · PNG JPG TIFF WEBP</small></span>
+      </label>
+      <div id="samples" class="samples" hidden><span class="tiny">Samples</span><div id="sampleList"></div></div>
+    </fieldset>
+
+    <fieldset class="step" style="--i:1">
+      <legend><b>02</b> Axes <span class="legend-note">values at the frame edges</span></legend>
+      <div class="axis-row">
+        <span class="axis-tag">X</span>
+        <label class="num"><span>min</span><input id="xmin" inputmode="decimal" value="0"></label>
+        <span class="arrow">→</span>
+        <label class="num"><span>max</span><input id="xmax" inputmode="decimal" value="100"></label>
+        <label class="switch" title="Logarithmic x axis"><input id="xlog" type="checkbox"><i></i><span>log</span></label>
+      </div>
+      <div class="axis-row">
+        <span class="axis-tag">Y</span>
+        <label class="num"><span>min</span><input id="ymin" inputmode="decimal" value="0"></label>
+        <span class="arrow">→</span>
+        <label class="num"><span>max</span><input id="ymax" inputmode="decimal" value="100"></label>
+        <label class="switch" title="Logarithmic y axis"><input id="ylog" type="checkbox"><i></i><span>log</span></label>
+      </div>
+      <div class="axis-row grid-row">
+        <span class="axis-tag small">Grid</span>
+        <label class="num"><span>Δx</span><input id="gdx" inputmode="decimal" placeholder="auto"></label>
+        <span class="arrow"> </span>
+        <label class="num"><span>Δy</span><input id="gdy" inputmode="decimal" placeholder="auto"></label>
+        <span class="tiny grid-note">re-plot only</span>
+      </div>
+    </fieldset>
+
+    <fieldset class="step" style="--i:2">
+      <legend><b>03</b> Plot frame</legend>
+      <div class="frame-state">
+        <span id="frameBadge" class="badge" data-kind="none">No image</span>
+        <div class="frame-actions">
+          <button type="button" id="btnRedetect" class="ghost" disabled title="Put the corners back where detection found them">Auto</button>
+          <button type="button" id="btnPlace" class="ghost" disabled title="Click the four corners on the image">Place</button>
+        </div>
+      </div>
+      <ol id="cornerList" class="corner-list"></ol>
+    </fieldset>
+
+    <fieldset class="step" style="--i:3">
+      <legend><b>04</b> Sampling</legend>
+      <div class="seg" role="radiogroup" id="sampleMode">
+        <button type="button" role="radio" data-mode="points" aria-checked="true">Count</button>
+        <button type="button" role="radio" data-mode="x_values" aria-checked="false">X values</button>
+        <button type="button" role="radio" data-mode="step" aria-checked="false">Step</button>
+      </div>
+      <label class="wide" data-for="points"><span>points, evenly spaced</span><input id="nPoints" inputmode="numeric" value="50"></label>
+      <label class="wide" data-for="x_values" hidden><span>x values, comma separated</span><input id="xValues" placeholder="20, 40, 52, 60, 70, 80, 90"></label>
+      <label class="wide" data-for="step" hidden><span>step along x</span><input id="step" inputmode="decimal" placeholder="5"></label>
+    </fieldset>
+
+    <fieldset class="step" style="--i:4">
+      <legend><b>05</b> Curve</legend>
+      <div class="seg" role="radiogroup" id="curveMode">
+        <button type="button" role="radio" data-mode="dark" aria-checked="true">Darkest ink</button>
+        <button type="button" role="radio" data-mode="color" aria-checked="false">By colour</button>
+      </div>
+      <div class="color-row" id="colorRow" hidden>
+        <input id="colorPick" type="color" value="#d0342c" aria-label="Curve colour">
+        <input id="colorText" value="#d0342c" spellcheck="false" aria-label="Curve colour as #rrggbb or hsv:h,s,v">
+      </div>
+      <label class="switch line"><input id="clutter" type="checkbox" checked><i></i><span>Remove gridlines, text &amp; specks</span></label>
+    </fieldset>
+
+    <fieldset class="step" style="--i:5">
+      <legend><b>06</b> Output</legend>
+      <label class="wide"><span>folder name</span><input id="outName" placeholder="image name" spellcheck="false"></label>
+      <label class="switch line"><input id="debug" type="checkbox" checked><i></i><span>Keep an image from every stage</span></label>
+    </fieldset>
+
+    <div class="run-wrap" style="--i:6">
+      <button type="submit" id="btnRun" class="run" disabled>
+        <span class="run-label">Digitize</span>
+        <svg class="run-arrow" viewBox="0 0 48 12" aria-hidden="true"><path d="M0 6h44M38 1l6 5-6 5" /></svg>
+      </button>
+      <span class="tiny kbd-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+    </div>
+  </form>
+
+  <!-- ============ PLATE ============ -->
+  <section class="plate" aria-label="Image and results">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="frame" aria-selected="true"><i>A</i>Frame</button>
+      <button role="tab" data-tab="overlay" aria-selected="false" disabled><i>B</i>Overlay</button>
+      <button role="tab" data-tab="replot" aria-selected="false" disabled><i>C</i>Re-plot</button>
+      <button role="tab" data-tab="chart" aria-selected="false" disabled><i>D</i>Data</button>
+      <button role="tab" data-tab="stages" aria-selected="false" disabled><i>E</i>Stages</button>
+      <span class="tabs-rule"></span>
+    </nav>
+
+    <div class="views">
+      <!-- A: frame editor -->
+      <div class="view" data-view="frame">
+        <div id="empty" class="empty">
+          <svg class="hero" viewBox="0 0 520 320" aria-hidden="true">
+            <g class="hero-grid"></g>
+            <path class="hero-axes" d="M60 270V30M60 270h420" />
+            <path class="hero-ref" d="M60 196h420M300 30v240" />
+            <path class="hero-dash" d="M60 258h420" />
+            <path class="hero-curve" d="M60 266c50-3 95-10 140-24s70-30 100-62 60-75 90-105 55-38 75-44" />
+            <g class="hero-corners">
+              <circle cx="60" cy="270" r="7" /><circle cx="480" cy="270" r="7" /><circle cx="480" cy="30" r="7" /><circle cx="60" cy="30" r="7" />
+            </g>
+            <g class="hero-dots"></g>
+          </svg>
+          <p class="empty-title">Photograph a chart.<br><em>Get the numbers back.</em></p>
+          <p class="empty-sub">Drop an image anywhere on this page. Perspective, glare and moiré are fine.</p>
+        </div>
+
+        <div id="editor" class="editor" hidden>
+          <svg id="stage" class="stage" tabindex="0" aria-label="Plot frame editor">
+            <image id="stageImg" preserveAspectRatio="none" />
+            <path id="shade" class="shade" fill-rule="evenodd" />
+            <polygon id="quad" class="quad" />
+            <g id="edgeLabels" class="edge-labels"></g>
+            <g id="handles"></g>
+          </svg>
+          <canvas id="loupe" class="loupe" width="360" height="360" hidden></canvas>
+          <div id="notice" class="notice" hidden></div>
+          <div class="hintbar"><span id="hint">Drag a corner to adjust · arrow keys nudge (Shift ×10)</span><span id="coordReadout" class="readout"></span></div>
+        </div>
+      </div>
+
+      <!-- B, C: images -->
+      <div class="view" data-view="overlay" hidden>
+        <figure class="figure"><a id="overlayLink" target="_blank" rel="noopener"><img id="overlayImg" alt="Detected frame and traced curve drawn on the photo"></a>
+          <figcaption>Frame, trace and sampled points drawn on the original photo. Click to open full size.</figcaption></figure>
+      </div>
+      <div class="view" data-view="replot" hidden>
+        <figure class="figure"><a id="replotLink" target="_blank" rel="noopener"><img id="replotImg" alt="Clean re-plot of the digitized curve"></a>
+          <figcaption>Clean re-plot from the digitized data.</figcaption></figure>
+      </div>
+
+      <!-- D: interactive chart -->
+      <div class="view" data-view="chart" hidden>
+        <div class="chart-wrap">
+          <svg id="chart" class="chart"></svg>
+          <div id="tip" class="tip" hidden></div>
+        </div>
+        <div class="legend">
+          <span><i class="dot measured"></i>measured</span>
+          <span><i class="dot filled"></i>interpolated across a gap</span>
+          <span><i class="dot outside"></i>outside the traced range</span>
+        </div>
+      </div>
+
+      <!-- E: debug stages -->
+      <div class="view" data-view="stages" hidden>
+        <div id="stageGrid" class="stage-grid"></div>
+      </div>
+
+      <!-- running cover -->
+      <div id="busy" class="busy" hidden>
+        <svg viewBox="0 0 300 160" aria-hidden="true">
+          <path class="busy-axes" d="M20 140V12M20 140h264" />
+          <path class="busy-curve" d="M22 136c30-2 55-6 80-16s40-22 58-42 36-45 54-58 30-12 44-12" />
+          <circle class="busy-pen" r="5" />
+        </svg>
+        <p class="busy-label">Digitizing <span id="busyTime">0.0 s</span></p>
+        <p class="tiny">load · frame · flatten · rectify · calibrate · ink · clutter · select · trace · resample</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEDGER ============ -->
+  <aside class="ledger" aria-label="Results">
+    <header class="ledger-head">
+      <h2>Readings</h2>
+      <span id="ledgerSub" class="tiny">nothing yet</span>
+    </header>
+
+    <div id="errorCard" class="error-card" hidden>
+      <div class="error-stage"><span id="errStage">stage</span> failed</div>
+      <p id="errMessage"></p>
+      <p id="errHint" class="error-hint"></p>
+    </div>
+
+    <div id="results" hidden>
+      <div class="stats">
+        <div><span class="tiny">points</span><b id="stKept">–</b></div>
+        <div><span class="tiny">gap-filled</span><b id="stFilled">–</b></div>
+        <div><span class="tiny">frame</span><b id="stFrame">–</b></div>
+        <div><span class="tiny">time</span><b id="stTime">–</b></div>
+      </div>
+
+      <ul id="warnings" class="warnings"></ul>
+
+      <div class="table-head">
+        <span class="tiny">x · y · flag</span>
+        <button type="button" id="btnCopy" class="ghost small">Copy as table</button>
+      </div>
+      <div class="table-scroll"><table id="table"><thead><tr><th>#</th><th>x</th><th>y</th><th></th></tr></thead><tbody></tbody></table></div>
+
+      <div class="downloads">
+        <a id="dlCsv" download>points.csv</a>
+        <a id="dlJson" download>points.json</a>
+        <a id="dlOverlay" download>overlay.png</a>
+        <a id="dlReplot" download>replot.png</a>
+      </div>
+      <p class="tiny out-path">Saved to <code id="outDir"></code></p>
+    </div>
+
+    <details class="cli" id="cliBox">
+      <summary>Same run from the command line</summary>
+      <pre id="cli"></pre>
+      <button type="button" id="btnCopyCli" class="ghost small">Copy command</button>
+    </details>
+  </aside>
+</main>
+
+<div id="dropVeil" class="drop-veil" hidden><span>Release to load the chart</span></div>
+<div id="toast" class="toast" hidden></div>
+<script src="/static/app.js" type="module"></script>
+</body>
+</html>

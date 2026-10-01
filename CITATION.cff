@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Chart Digitizer in your work, please cite it as below."
+title: "Chart Digitizer: offline extraction of data points from photos of line charts"
+type: software
+authors:
+  - given-names: Abhinaba
+    family-names: Kar
+repository-code: "https://github.com/ov9bo/Chart-Digitizer"
+url: "https://ov9bo.github.io/Chart-Digitizer/"
+license: MIT
+version: 0.1.0
+date-released: "2026-10-01"
+keywords:
+  - plot digitizer
+  - graph digitizer
+  - data extraction
+  - computer vision

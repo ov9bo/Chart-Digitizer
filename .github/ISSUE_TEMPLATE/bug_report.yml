@@ -1,0 +1,33 @@
+name: A chart didn't digitize
+description: Wrong frame, wrong curve, an error, or numbers that are off.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Please only attach images you are allowed to share. Crop or blur anything private.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The error message, or what is wrong with the result.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or settings
+      description: The exact `digitize` command (the web app shows it under "Same run from the command line") or your YAML.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: images
+    attributes:
+      label: Images
+      description: The chart if shareable, plus `overlay.png` and, ideally, the `debug/` images from a `--debug` run.
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Windows 11, Python 3.13, chart-digitizer 0.1.0"

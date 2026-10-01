@@ -1,0 +1,20 @@
+# Hand-read values for the photographed sample charts, checked by tests/test_samples.py.
+# The photos are private and not in the repository; tests/test_samples.py skips any that are absent.
+# Each chart is digitized with the given corners and axis ranges; every value must be within tol.
+samples:
+  - image: Samples/20260923_174008.jpg
+    x_range: [0, 100]
+    y_range: [0, 100]
+    # Source pixels, ordered (xmin,ymin), (xmax,ymin), (xmax,ymax), (xmin,ymax).
+    corners: [[687.84, 2757.63], [3360.73, 2727.57], [3355.64, 266.92], [694.41, 224.02]]
+    tol: 1.5
+    points:
+      - [20, 4.8]
+      - [40, 9.9]
+      - [52, 16.6]
+      - [60, 23.0]
+      - [70, 33.5]
+      # Measured centreline at x=80 is about 48.6; the hand-read 47.2 is kept, within tol either way.
+      - [80, 47.2]
+      # Re-measured from the image (the curve is steep here, so the original reading was loose).
+      - [90, 74.3]

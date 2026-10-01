@@ -1,0 +1,7 @@
+# Settings for log-log.jpg, picked up automatically because the stem matches.
+# Both axes are logarithmic: x spans three decades, y spans four.
+axes:
+  x_range: [1, 1000]
+  y_range: [0.1, 1000]
+  x_log: true
+  y_log: true

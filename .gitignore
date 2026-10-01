@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Output of the tools
+out/
+synth/
+results/
+
+# Private photos (never published)
+Samples/
+
+# Local tooling and editors
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
