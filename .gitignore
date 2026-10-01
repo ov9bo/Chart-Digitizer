@@ -3,8 +3,8 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
-build/
-dist/
+/build/
+/dist/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
@@ -12,12 +12,12 @@ dist/
 htmlcov/
 
 # Output of the tools
-out/
-synth/
-results/
+/out/
+/synth/
+/results/
 
 # Private photos (never published)
-Samples/
+/Samples/
 
 # Local tooling and editors
 .claude/
